@@ -29,8 +29,12 @@ network Lin
         @display("bgb=730,367");
     submodules:
         //todo: place the slaves and master node. define the number of gates for the master
+        master: LinMaster;
+        slaves[numSlaves]: LinSlave;
         
     connections:
         //todo: connect each slave with the master
-
+		for i=0..numSlaves-1{
+			master.gate++ <--> {delay=0.1ms;} <--> slaves[i].gate;
+		}
 }
