@@ -21,7 +21,8 @@ simple LinSlave extends LinNode
     parameters:
         @class(LinSlave);
     gates:
-          inout gate;
+          output outgate;
+          input ingate;
         //todo: define the gate going to/coming from the bus
 
 }

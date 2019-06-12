@@ -24,9 +24,31 @@ LinSlave::~LinSlave()
 {}
 
 void LinSlave::receiveFrame(cMessage *msg) {
+    LinRequestFrame *frame = (LinRequestFrame*) msg;
 
+    int message_id = frame->getMessageId();
     /*
      * todo: handle received Frames, send responses
      */
+    FRAME_TYPE type = getFrameType(message_id);
 
+    switch(type){
+        case UNCONDITIONAL_FRAME:
+            if(getId() == message_id){
+                int response = intuniform(0, INT32_MAX);
+                sendLinResponse(message_id, response);
+            }
+            break;
+        case SPORADIC_FRAME:
+            if(getId() == message_id){
+                int response = intuniform(0, 1);
+                sendLinResponse(message_id, response);
+            }
+            break;
+        case EVENT_TRIGGERED_FRAME:
+            if(isResponsibleForEventTriggered(message_id)){
+                sendLinResponse(message_id, 0);
+            }
+            break;
+    }
 }

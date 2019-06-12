@@ -43,7 +43,22 @@ protected:
     /*
      * todo: declare needed member variables
      */
+    int timeCounter;
+    int eventCounter;
+    int event_id;
+    int collisions;
 
+    bool sporadicPositiv;
+
+    simtime_t sended_sporadic;
+    cMessage *clockTimer;
+    cMessage *eventTimer;
+
+    cOutVector sporadic_delay;
+    cOutVector collision_vec;
+    cOutVector unconditional_vec;
+    cOutVector sporadic_vec;
+    cOutVector event_vec;
 };
 
 #endif /* LINMASTER_H_ */

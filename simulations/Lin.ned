@@ -18,7 +18,10 @@ package lin.simulations;
 import lin.LinMaster;
 import lin.LinSlave;
 
-
+channel Bus extends ned.DelayChannel
+{
+    delay = 0.1ms;
+}
 //ned defining the LIN network
 network Lin
 {
@@ -35,6 +38,7 @@ network Lin
     connections:
         //todo: connect each slave with the master
 		for i=0..numSlaves-1{
-			master.gate++ <--> {delay=0.1ms;} <--> slaves[i].gate;
+			master.outgate++ --> Bus --> slaves[i].ingate;
+			master.ingate++ <-- Bus <-- slaves[i].outgate;
 		}
 }

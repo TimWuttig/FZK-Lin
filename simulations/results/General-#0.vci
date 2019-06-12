@@ -1,0 +1,30 @@
+file 976639 1560323714                                          
+version 2
+run General-0-20190612-09:15:02-7730
+attr configname General
+attr datetime 20190612-09:15:02
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsf ""
+attr measurement ""
+attr network Lin
+attr processid 7730
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+
+vector 0 Lin.master "Unconditional Frame Ids" ETV
+vector 1 Lin.master "Eventtriggered Frame Ids" ETV
+vector 2 Lin.master "Sporadic Frame Ids" ETV
+vector 3 Lin.master "Sporadic Frame delay" ETV
+0	541 624549 1 3856185 0.01 491.52 32768 0 39 642374 16957648
+vector 4 Lin.master "Number of collisions" ETV
+0	625137 141502 3856237 4707481 491.53 600 7232 0 39 140877 3714643
+1	766639 195805 157 4707221 0.05 599.99 10000 50 59 545293 29816365
+2	962444 8954 24451 4683225 3.15 596.91 456 40 49 20314 908582
+3	971398 5220 26576 4683276 3.3902 596.9102 204 0.0002 0.6602 15.1608 3.39005616
+4	976618 20 4707482 4707482 600 600 1 40000 40000 40000 1600000000
+

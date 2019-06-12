@@ -21,9 +21,9 @@ LinMaster::LinMaster() {
 }
 
 LinMaster::~LinMaster() {
-    /*
-     * todo: delete all cMessages
-     */
+    delete clockTimer;
+    delete eventTimer;
+    delete changeSporadic;
 }
 
 void LinMaster::initialize() {
@@ -34,15 +34,30 @@ void LinMaster::initialize() {
     scheduleAt(simTime() + 2 + dblrand() * 2, changeSporadic);
 
     /*
-     * todo: initialize all variables needed
+     * initialize all variables needed
      */
+    timeCounter = 0;
+    collisions = 0;
+    eventCounter = 0;
 
+    sporadicPositiv = true;
+
+    sporadic_vec.setName("Sporadic Frame Ids");
+    unconditional_vec.setName("Unconditional Frame Ids");
+    event_vec.setName("Eventtriggered Frame Ids");
+    sporadic_delay.setName("Sporadic Frame delay");
+    collision_vec.setName("Number of collisions");
+
+    eventTimer = new cMessage("eventTimer");
+    clockTimer = new cMessage("clockTimer");
+    scheduleAt(simTime() + 0.01, clockTimer);
 }
 
 void LinMaster::finish() {
     /*
      * Record final statistics
      */
+    collision_vec.record(collisions);
 }
 
 void LinMaster::handleSelfMessage(cMessage *msg) {
@@ -53,15 +68,69 @@ void LinMaster::handleSelfMessage(cMessage *msg) {
     }
 
     /*
-     * todo: handle Self Messages in order to send next packet or check timeouts
+     * handle Self Messages in order to send next packet or check timeouts
      */
+    if (msg == clockTimer){
+        timeCounter = (timeCounter + 1) % 6;
+        switch(timeCounter){
+            case 3:
+                if(needSporadic){
+                    int id = intuniform(40,49);
+                    sendLinRequest(id);
+                    sporadic_vec.record(id);
+                    if(sporadicPositiv){
+                        sended_sporadic = simTime();
+                        sporadicPositiv = false;
+                    }
+                }
+                break;
+            case 5:
+                event_id = intuniform(50, 59);
+                sendLinRequest(event_id);
+                scheduleAt(simTime() + 0.001, eventTimer);
+                event_vec.record(event_id);
+                break;
+            default:
+                int id = intuniform(0, 39);
+                sendLinRequest(id);
+                unconditional_vec.record(id);
+                break;
+        }
 
+        scheduleAt(simTime()+ 0.01, clockTimer);
+    }
+
+    if(msg = eventTimer){
+        if(eventCounter > 1){
+            std::vector<int> responsible = getEventTriggeredIds(event_id);
+            for(int id: responsible){
+                sendLinRequest(id);
+            }
+        }
+
+        eventCounter = 0;
+    }
 }
 
 void LinMaster::receiveFrame(cMessage *msg) {
 
     /*
-     * todo: handle received Frames, check for collisions
+     * handle received Frames, check for collisions
      */
+    LinResponseFrame* frame = (LinResponseFrame*) msg;
+    FRAME_TYPE type = getFrameType(frame->getMessageId());
+    switch(type){
+        case SPORADIC_FRAME:
+            if(frame->getResponse() == 1){
+                needSporadic = false;
+                sporadic_delay.record(simTime() - sended_sporadic);
+                sporadicPositiv = true;
+            }
+            else needSporadic = true;
+            break;
+        case EVENT_TRIGGERED_FRAME:
+            eventCounter++;
+            collisions++;
+    }
 }
 
