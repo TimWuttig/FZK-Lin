@@ -43,8 +43,10 @@ protected:
     /*
      * todo: declare needed member variables
      */
-    int timeCounter;
+    int eventtriggeredCounter;
+    int sporadicCounter;
     int eventCounter;
+
     int event_id;
     int collisions;
 

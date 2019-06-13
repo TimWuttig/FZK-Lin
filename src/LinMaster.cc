@@ -21,9 +21,9 @@ LinMaster::LinMaster() {
 }
 
 LinMaster::~LinMaster() {
-    delete clockTimer;
-    delete eventTimer;
-    delete changeSporadic;
+    cancelAndDelete(clockTimer);
+    cancelAndDelete(eventTimer);
+    cancelAndDelete(changeSporadic);
 }
 
 void LinMaster::initialize() {
@@ -36,7 +36,8 @@ void LinMaster::initialize() {
     /*
      * initialize all variables needed
      */
-    timeCounter = 0;
+    eventtriggeredCounter = 0;
+    sporadicCounter = 0;
     collisions = 0;
     eventCounter = 0;
 
@@ -71,30 +72,28 @@ void LinMaster::handleSelfMessage(cMessage *msg) {
      * handle Self Messages in order to send next packet or check timeouts
      */
     if (msg == clockTimer){
-        timeCounter = (timeCounter + 1) % 6;
-        switch(timeCounter){
-            case 3:
-                if(needSporadic){
-                    int id = intuniform(40,49);
-                    sendLinRequest(id);
-                    sporadic_vec.record(id);
-                    if(sporadicPositiv){
-                        sended_sporadic = simTime();
-                        sporadicPositiv = false;
-                    }
+        eventtriggeredCounter = (eventtriggeredCounter + 1) % 6;
+        sporadicCounter = (sporadicCounter + 1) % 4;
+
+        if(eventtriggeredCounter == 5){
+            event_id = intuniform(50, 59);
+            sendLinRequest(event_id);
+            scheduleAt(simTime() + 0.001, eventTimer);
+            event_vec.record(event_id);
+        }else {
+            if(sporadicCounter == 3 && needSporadic){
+                int id = intuniform(40,49);
+                sendLinRequest(id);
+                sporadic_vec.record(id);
+                if(sporadicPositiv){
+                    sended_sporadic = simTime();
+                    sporadicPositiv = false;
                 }
-                break;
-            case 5:
-                event_id = intuniform(50, 59);
-                sendLinRequest(event_id);
-                scheduleAt(simTime() + 0.001, eventTimer);
-                event_vec.record(event_id);
-                break;
-            default:
+            }else{
                 int id = intuniform(0, 39);
                 sendLinRequest(id);
                 unconditional_vec.record(id);
-                break;
+            }
         }
 
         scheduleAt(simTime()+ 0.01, clockTimer);
